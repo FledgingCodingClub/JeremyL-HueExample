@@ -2,16 +2,24 @@
 
 from os import path
 from qhue import Bridge, QhueException, create_new_username
+from sys import argv
+import weather
 
 # the IP address of your bridge
 BRIDGE_IP = "192.168.1.242"
-#BRIDGE_IP = "172.16.74.125"
+
 
 # the path for the username credentials file
 CRED_FILE_PATH = "qhue_username.txt"
 
 def main():
-
+    temp = None
+    if len(argv) == 2:
+        temp = int(argv[1])
+    else:
+        temp = weather.WeatherCom().temperature()
+    
+    
     # check for a credential file
     if not path.exists(CRED_FILE_PATH):
 
@@ -35,10 +43,21 @@ def main():
 
     # create a lights resource
     lights = bridge.lights
-    lights[1].state(bri=100,hue=6500)
-
+    
+    if temp < 30:
+        lights[1].state(bri=100,hue=46920)
+        #print "Less than 30"
+    elif temp <= 70:
+        lights[1].state(bri=100,hue=56100)
+        #print "Greater than or eq to 30 and <=70"
+    elif temp <= 120:
+        lights[1].state(bri=100,hue=65280)
+        #print "LT or EQ 120"
+    else:
+        print("Error: Temperature out of Range")
+    
     # query the API and print the results
-    print(lights())
+    #print(lights())
 
 if __name__ == "__main__":
     main()
